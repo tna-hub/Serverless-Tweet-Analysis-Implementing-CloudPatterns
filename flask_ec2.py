@@ -22,17 +22,16 @@ import json
 app = Flask(__name__)
 
 """This method is calling another Lambda function"""
-
-
 def call_lambda_handler1(data):
+    print(data)
     client = boto3.client("lambda")
     response = client.invoke(
         FunctionName='lambda_handler1',
         InvocationType='RequestResponse',
-        LogType='Tail',
+        LogType='None',
         Payload=json.dumps(data),
     )
-    return str(response)
+    return json.load(response['Payload'])
 
 def preprocess(data):
     for k, value in list(data.items()):

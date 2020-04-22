@@ -1,0 +1,3 @@
+boto3~=1.12.43
+Flask~=1.1.2
+vaderSentiment~=3.3.1
