@@ -1,5 +1,7 @@
 from __future__ import print_function
 import json
+import time
+
 import boto3
 import vaderSentiment.vaderSentiment as vader
 
@@ -14,14 +16,13 @@ def call_lambda_handler2(data):
         InvocationType='RequestResponse',
         Payload=json.dumps(data),
     )
-    return str(response)
+    res = response['Payload']
+    return json.load(res)
 
 
 def get_sentiment(tweet):
     scores = analyzer.polarity_scores(tweet['text'])
-    score = None
     compound = scores['compound']
-    sentiment = None
 
     if compound < -0.05:
         sentiment = "Negative"
@@ -33,19 +34,28 @@ def get_sentiment(tweet):
         sentiment = "Positive"
         score = scores["pos"]
 
-    tweet_sentiment = {"sentiment": sentiment,
-                       "score": score,
-                       "id": tweet['id'],
-                       "date": tweet['date']
-                       }
+    tweet_sentiment = {
+        "id": tweet['id'],
+        "sentiment": sentiment,
+        "score": score,
+    }
     return tweet_sentiment
 
 
 def lambda_handler(event, context):
-    print(event)
+    start_time = time.time()
     to_save = {}
-    for k, value in list(event.items()):
-        to_save[k] = get_sentiment(value)
-    print(to_save)
-    return to_save
-    raise Exception('Something went wrong')
+    for k, value in list(event["data"].items()):
+        try:
+            to_save[k] = get_sentiment(value)
+            message = "Execution succeeded"
+        except Exception as e:
+            message = str(e)
+    event["data"] = to_save
+    tim = start_time - time.time()
+    res_lh1 = {"time": tim,
+               "message": message}
+    res_lh2 = call_lambda_handler2(event)
+    res = {"lh1": res_lh1,
+           "lh2": res_lh2}
+    return res

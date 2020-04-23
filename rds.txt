@@ -1,0 +1,9 @@
+host="db.cyz8cc7o8ffv.us-east-1.rds.amazonaws.com"
+port=5432,
+database="sentiments"
+user="postgres"
+password="postgres"
+
+##I used schemas proxy1 and proxy2 for proxy, sharding1 and sharding2 for sharding; and tables to implements instances
+Tables for proxy pattern: proxy1.sentiments and proxy2.sentiments
+Tables for sharding pattern: sharding1.sentiments and sharding2.sentiments
