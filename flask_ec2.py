@@ -126,11 +126,12 @@ def sharding():
         res = {}
         res['lh1'] = lh['lh1']
         res['lh2'] = lh['lh2']
-        res['time_to_predict_and_save_sharding'] = abs(res['lh1']['time']) + abs(res['lh2']['time'])
+        res['lh1 + lh2'] = abs(res['lh1']['time']) + abs(res['lh2']['time'])
+        res['time_to_predict_and_save_sharding'] = time.time() - start_time
         start_time = time.time()  # Saving the start time to retrieve
         keys = [int(i) for i in data.keys()]
         rows = get_res(keys, "sharding")
-        res['time_to_retrieve_sharding'] = abs(start_time - time.time())
+        res['time_to_retrieve_sharding'] = time.time() - start_time
         print(json.dumps(res, indent=4, sort_keys=True))
         return jsonify(rows)
 
