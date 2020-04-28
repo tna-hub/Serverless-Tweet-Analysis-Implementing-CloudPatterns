@@ -52,7 +52,7 @@ def lambda_handler(event, context):
         except Exception as e:
             message = str(e)
     event["data"] = to_save
-    tim = start_time - time.time()
+    tim = abs(start_time - time.time())
     res_lh1 = {"time": tim,
                "message": message}
     res_lh2 = call_lambda_handler2(event)
