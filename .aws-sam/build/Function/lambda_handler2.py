@@ -39,6 +39,7 @@ def exec(conn, inst, k, t):  # Execute the insert to the database
     except Exception as e:
         return False, str(e)
 
+
 def proxy(conn, d):  # Proxy pattern
     for k, t in d.items():
         instance = choice(["proxy1", "proxy2"])  # Randomly selects the instance to save the data
@@ -51,7 +52,7 @@ def proxy(conn, d):  # Proxy pattern
 
 
 def sharding(conn, d):  # select the data to be inserted in each instance
-    n = int(len(list(d)) / 2)  # Half of the data goes to first instance
+    n = choice(list(range(1, len(list(d)) + 1)))  # n first data goes to first instance
     i = 0
     for k, t in d.items():
         instance = "sharding1" if i < n else "sharding2"  # Specify the instance where the data will be saved
@@ -64,16 +65,17 @@ def sharding(conn, d):  # select the data to be inserted in each instance
     return message
 
 
-
 def lambda_handler(event, context):
-    start_time = time.time()  # Saving the start time
     patt = event["pattern"]
     data = event["data"]
     to_s3(data)
     conn = config()
+    start_time = time.time()  # Saving the start time
     if patt == "proxy":
+        start_time = time.time()  # Saving the start time
         message = proxy(conn, data)
     elif patt == "sharding":
+        start_time = time.time()  # Saving the start time
         message = sharding(conn, data)
     db_time = time.time() - start_time
     res = {"time": db_time,

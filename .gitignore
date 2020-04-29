@@ -2,3 +2,4 @@ venv/
 .vscode/
 .idea/
 .aws-sam
+test.py

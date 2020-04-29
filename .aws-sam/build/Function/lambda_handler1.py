@@ -51,9 +51,10 @@ def lambda_handler(event, context):
             message = "Execution succeeded"
         except Exception as e:
             message = str(e)
+            break
     event["data"] = to_save
-    tim = start_time - time.time()
-    res_lh1 = {"time": tim,
+    sentiment_time = time.time() - start_time
+    res_lh1 = {"time": sentiment_time,
                "message": message}
     res_lh2 = call_lambda_handler2(event)
     res = {"lh1": res_lh1,

@@ -37,11 +37,14 @@ def config():
 def get_res(keys, pattern):
     conn = config()
     cursor = conn.cursor(cursor_factory=RealDictCursor)
-    inst = pattern
     sql = "select * " \
-          "from %(inst)s1.sentiments as a, %(inst)s2.sentiments as b " \
-          "where a.num  in %(vals)s or b.num in %(vals)s" % {
-              "inst": inst, "vals": tuple(keys)}
+          "from %(pattern)s1.sentiments " \
+          "where num  in %(vals)s "\
+          "UNION " \
+          "select * " \
+          "from %(pattern)s2.sentiments " \
+          "where num  in %(vals)s" % {
+              "pattern": pattern, "vals": tuple(keys)}
     cursor.execute(sql)
     rows = cursor.fetchall()
     res = {}
@@ -51,17 +54,16 @@ def get_res(keys, pattern):
             'sentiment': row['sentiment'],
             'score': row['score']
         }
-    print(res)
+    conn.close()
     return res
 
 
 app = Flask(__name__)
 
-"""This method is calling another Lambda function"""
+# This method is calling another Lambda function
 
 
 def call_lambda_handler1(data):
-    print(data)
     client = boto3.client("lambda")
     response = client.invoke(
         FunctionName='lambda_handler1',
@@ -80,7 +82,7 @@ def preprocess(data):
         date = value['date']
         # Delete tweets without idea or date
         if tid is None or date is None:
-            print("Deleted the tweet with id {} and date {}".format(tid, date))
+            print("Deleted a tweet with no id or date")
             del data[k]
     return data
 
@@ -92,8 +94,6 @@ def proxy():
                " the text you want analyzed in the body."
     else:
         data = request.get_json(force=True)
-        # Saving the start time
-        start_time = time.time()
         data = preprocess(data)
         to_send = {"pattern": "proxy",
                    "data": data}
@@ -101,10 +101,11 @@ def proxy():
         res = {}
         res['lh1'] = lh['lh1']
         res['lh2'] = lh['lh2']
-        res['time_to_predict_and_save_proxy'] = start_time - time.time()
-        start_time = time.time()
-        rows = get_res(data.keys(), "proxy")
-        res['time_to_retrieve_proxy'] = start_time - time.time()
+        res['time_to_predict_and_save_proxy'] = abs(res['lh1']['time']) + abs(res['lh2']['time'])
+        start_time = time.time()         # Saving the start time to retrieve
+        keys = [int(i) for i in data.keys()]
+        rows = get_res(keys, "proxy")
+        res['time_to_retrieve_proxy'] = abs(start_time - time.time())
         print(json.dumps(res, indent=4, sort_keys=True))
         return jsonify(rows)
 
@@ -122,13 +123,13 @@ def sharding():
         to_send = {"pattern": "sharding",
                    "data": data}
         lh = call_lambda_handler1(to_send)
-        res = {}
-        res['lh1'] = lh['lh1']
-        res['lh2'] = lh['lh2']
-        res['time_to_predict_and_save_sharding'] = start_time - time.time()
-        start_time = time.time()
-        rows = get_res(data.keys(), "sharding")
-        res['time_to_retrieve_sharding'] = start_time - time.time()
+        res = {'lh1': lh['lh1'], 'lh2': lh['lh2']}
+        res['lh1 + lh2'] = abs(res['lh1']['time']) + abs(res['lh2']['time'])
+        res['time_to_predict_and_save_sharding'] = time.time() - start_time
+        start_time = time.time()  # Saving the start time to retrieve
+        keys = [int(i) for i in data.keys()]
+        rows = get_res(keys, "sharding")
+        res['time_to_retrieve_sharding'] = time.time() - start_time
         print(json.dumps(res, indent=4, sort_keys=True))
         return jsonify(rows)
 

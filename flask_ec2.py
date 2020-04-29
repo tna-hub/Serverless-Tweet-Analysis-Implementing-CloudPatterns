@@ -60,7 +60,7 @@ def get_res(keys, pattern):
 
 app = Flask(__name__)
 
-"""This method is calling another Lambda function"""
+# This method is calling another Lambda function
 
 
 def call_lambda_handler1(data):
@@ -93,21 +93,27 @@ def proxy():
         return "To access this service send a POST request to this URL with" \
                " the text you want analyzed in the body."
     else:
+        pattern = "proxy"
+        start_time_save = time.time()  # Saving the start time to process and save
         data = request.get_json(force=True)
         data = preprocess(data)
-        to_send = {"pattern": "proxy",
+        to_send = {"pattern": pattern,
                    "data": data}
         lh = call_lambda_handler1(to_send)
-        res = {}
-        res['lh1'] = lh['lh1']
-        res['lh2'] = lh['lh2']
-        res['time_to_predict_and_save_proxy'] = abs(res['lh1']['time']) + abs(res['lh2']['time'])
-        start_time = time.time()         # Saving the start time to retrieve
+        res = {'lh1': lh['lh1'], 'lh2': lh['lh2'],
+               'time_to_predict_and_save_{}'.format(pattern): time.time() - start_time_save}
+        start_time_retrieve = time.time()  # Saving the start time to retrieve
         keys = [int(i) for i in data.keys()]
-        rows = get_res(keys, "proxy")
-        res['time_to_retrieve_proxy'] = abs(start_time - time.time())
+        rows = get_res(keys, pattern)
+        res['time_to_retrieve_{}'.format(pattern)] = time.time() - start_time_retrieve
+        res['whole_time'] = time.time() - start_time_save
         print(json.dumps(res, indent=4, sort_keys=True))
-        return jsonify(rows)
+        resu = '{}\t{}\t{}\t{}\t{}'.format(res['lh1']['time'],
+                                           res['lh2']['time'],
+                                           res['time_to_predict_and_save_{}'.format(pattern)],
+                                           res['time_to_retrieve_{}'.format(pattern)],
+                                           res['whole_time'])
+        return resu
 
 
 @app.route('/sentiment/sharding', methods=["POST", "GET"])
@@ -116,24 +122,26 @@ def sharding():
         return "To access this service send a POST request to this URL with" \
                " the text you want analyzed in the body."
     else:
+        pattern = "sharding"
+        start_time_save = time.time()  # Saving the start time to process and save
         data = request.get_json(force=True)
-        # Saving the start time
-        start_time = time.time()
         data = preprocess(data)
-        to_send = {"pattern": "sharding",
+        to_send = {"pattern": pattern,
                    "data": data}
         lh = call_lambda_handler1(to_send)
-        res = {}
-        res['lh1'] = lh['lh1']
-        res['lh2'] = lh['lh2']
-        res['lh1 + lh2'] = abs(res['lh1']['time']) + abs(res['lh2']['time'])
-        res['time_to_predict_and_save_sharding'] = time.time() - start_time
-        start_time = time.time()  # Saving the start time to retrieve
+        res = {'lh1': lh['lh1'], 'lh2': lh['lh2'], 'time_to_predict_and_save_{}'.format(pattern): time.time() - start_time_save}
+        start_time_retrieve = time.time()  # Saving the start time to retrieve
         keys = [int(i) for i in data.keys()]
-        rows = get_res(keys, "sharding")
-        res['time_to_retrieve_sharding'] = time.time() - start_time
+        rows = get_res(keys, pattern)
+        res['time_to_retrieve_{}'.format(pattern)] = time.time() - start_time_retrieve
+        res['whole_time'] = time.time() - start_time_save
         print(json.dumps(res, indent=4, sort_keys=True))
-        return jsonify(rows)
+        resu = '{}\t{}\t{}\t{}\t{}'.format(res['lh1']['time'],
+                                          res['lh2']['time'],
+                                          res['time_to_predict_and_save_{}'.format(pattern)],
+                                          res['time_to_retrieve_{}'.format(pattern)],
+                                          res['whole_time'])
+        return resu
 
 
 if __name__ == "__main__":

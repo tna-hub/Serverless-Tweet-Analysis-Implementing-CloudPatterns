@@ -66,17 +66,18 @@ def sharding(conn, d):  # select the data to be inserted in each instance
 
 
 def lambda_handler(event, context):
-    start_time = time.time()  # Saving the start time
     patt = event["pattern"]
     data = event["data"]
     to_s3(data)
     conn = config()
+    start_time = time.time()  # Saving the start time
     if patt == "proxy":
+        start_time = time.time()  # Saving the start time
         message = proxy(conn, data)
     elif patt == "sharding":
+        start_time = time.time()  # Saving the start time
         message = sharding(conn, data)
     db_time = time.time() - start_time
     res = {"time": db_time,
            "message": message}
     return res
-
