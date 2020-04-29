@@ -108,12 +108,7 @@ def proxy():
         res['time_to_retrieve_{}'.format(pattern)] = time.time() - start_time_retrieve
         res['whole_time'] = time.time() - start_time_save
         print(json.dumps(res, indent=4, sort_keys=True))
-        resu = '{}\t{}\t{}\t{}\t{}'.format(res['lh1']['time'],
-                                           res['lh2']['time'],
-                                           res['time_to_predict_and_save_{}'.format(pattern)],
-                                           res['time_to_retrieve_{}'.format(pattern)],
-                                           res['whole_time'])
-        return resu
+        return jsonify(rows)
 
 
 @app.route('/sentiment/sharding', methods=["POST", "GET"])
@@ -136,12 +131,7 @@ def sharding():
         res['time_to_retrieve_{}'.format(pattern)] = time.time() - start_time_retrieve
         res['whole_time'] = time.time() - start_time_save
         print(json.dumps(res, indent=4, sort_keys=True))
-        resu = '{}\t{}\t{}\t{}\t{}'.format(res['lh1']['time'],
-                                          res['lh2']['time'],
-                                          res['time_to_predict_and_save_{}'.format(pattern)],
-                                          res['time_to_retrieve_{}'.format(pattern)],
-                                          res['whole_time'])
-        return resu
+        return jsonify(rows)
 
 
 if __name__ == "__main__":
