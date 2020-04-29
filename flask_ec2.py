@@ -2,8 +2,6 @@ from __future__ import print_function
 import subprocess
 import sys
 import time
-import psycopg2
-from psycopg2.extras import RealDictCursor
 
 
 # Initialisation
@@ -11,7 +9,7 @@ def install(package):
     subprocess.check_call([sys.executable, "-m", "pip", "install", package])
 
 
-pkgs = ['flask', 'boto3', 'psycopg2']
+pkgs = ['flask', 'boto3', 'psycopg2-binary']
 for pkg in pkgs:
     install(pkg)
 
@@ -20,6 +18,8 @@ from flask import request
 from flask import jsonify
 import boto3
 import json
+import psycopg2
+from psycopg2.extras import RealDictCursor
 
 
 def config():

@@ -1,3 +1,4 @@
+import json
 import subprocess
 import sys
 
@@ -24,14 +25,14 @@ def start(pattern):
          "192.168.13.138:5000/sentiment/{}".format(pattern)])"""
     process = subprocess.Popen('curl -X POST -H'
                                '"Content-type: application/json" --data @/home/aqui/data.json '
-                               '"192.168.13.138:5000/sentiment/{}"'.format(pattern),
+                               '"ec2-54-242-46-38.compute-1.amazonaws.com:5000/sentiment/{}"'.format(pattern),
                                stdout=subprocess.PIPE,
                                stderr=subprocess.PIPE,
                                shell=True)
-    output = process.stdout.read()
-    print(output.decode())
+    output = process.stdout.read().decode("utf-8")
+    output = json.loads(output)
+    output = json.dumps(output, indent=4)
+    print(output)
 
 delete()
-for i in range(0, 10):
-    start("proxy")
-    delete()
+start("sharding")
