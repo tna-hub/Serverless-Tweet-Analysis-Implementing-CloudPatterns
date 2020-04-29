@@ -57,12 +57,10 @@ def get_res(keys, pattern):
     conn.close()
     return res
 
-
+#Declaring the flask app
 app = Flask(__name__)
 
 # This method is calling another Lambda function
-
-
 def call_lambda_handler1(data):
     client = boto3.client("lambda")
     response = client.invoke(
@@ -74,6 +72,7 @@ def call_lambda_handler1(data):
     return json.load(response['Payload'])
 
 
+#This method preprocesses the tweets (removing non ascii characteers)
 def preprocess(data):
     for k, value in list(data.items()):
         # Remove non ascii characters from tweets
@@ -87,6 +86,7 @@ def preprocess(data):
     return data
 
 
+# Route for proxy pattern
 @app.route('/sentiment/proxy', methods=["POST", "GET"])
 def proxy():
     if request.method != "POST":
@@ -111,6 +111,7 @@ def proxy():
         return jsonify(rows)
 
 
+# Route for sharding pattern
 @app.route('/sentiment/sharding', methods=["POST", "GET"])
 def sharding():
     if request.method != "POST":
@@ -134,6 +135,7 @@ def sharding():
         return jsonify(rows)
 
 
+# Launching the app
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000)
 

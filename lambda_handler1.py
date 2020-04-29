@@ -9,6 +9,7 @@ print('Loading function')
 analyzer = vader.SentimentIntensityAnalyzer()
 
 
+#This method calls lambda_handler2
 def call_lambda_handler2(data):
     client = boto3.client("lambda")
     response = client.invoke(
@@ -20,6 +21,7 @@ def call_lambda_handler2(data):
     return json.load(res)
 
 
+# This methods takes a tweet as argument an returns its sentiment
 def get_sentiment(tweet):
     scores = analyzer.polarity_scores(tweet['text'])
     compound = scores['compound']

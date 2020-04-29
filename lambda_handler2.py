@@ -8,9 +8,10 @@ import boto3
 from random import choice
 
 s3 = boto3.client('s3')
-bucket: str = "aqui-tp3"  # Set your bucket name here
+bucket: str = "aqui-tp3"  # Important!!! Set your bucket name here
 
 
+# Connecting to the database
 def config():
     try:
         conn = psycopg2.connect(host="db.cyz8cc7o8ffv.us-east-1.rds.amazonaws.com",
@@ -23,6 +24,7 @@ def config():
     return conn
 
 
+# This method uploads result to s3
 def to_s3(data):
     data = json.dumps(data, indent=2).encode('utf-8')
     f = io.BytesIO(data)
@@ -51,7 +53,7 @@ def proxy(conn, d):  # Proxy pattern
     return message
 
 
-def sharding(conn, d):  # select the data to be inserted in each instance
+def sharding(conn, d):  # sharding pattern
     n = choice(list(range(1, len(list(d)) + 1)))  # n first data goes to first instance
     i = 0
     for k, t in d.items():
