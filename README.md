@@ -1,4 +1,3 @@
-# log8415-TP3
 ## Serverless Tweet Analysis Implementing Cloud Pattern
 
 This repo contains the python code for a cloud RESTful application that analyses sentiment from tweets.
