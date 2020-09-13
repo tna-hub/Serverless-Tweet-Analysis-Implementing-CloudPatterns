@@ -7,14 +7,14 @@ It implements two cloud patterns (proxy pattern and sharding pattern) using post
 
 The aim of the project is to analyse the impact of different cloud patterns on the performance of a cloud application.
 
-The full paper of the project is available in this repository (with instructions on how to replicate the project).
+The [full paper](https://github.com/tna-hub/Serverless-Tweet-Analysis-Implementing-CloudPatterns/blob/master/final%20paper.pdf) of the project is available in this repository (with instructions on how to replicate the project).
 
-##Tools used:
-Programming language: Python
-Sentiment analysis tool: [VADER: A Parsimonious Rule-based Model for Sentiment Analysis of Social Media Text](http://eegilbert.org/papers/icwsm14.vader.hutto.pdf) by Gilbert E.E. and Hutto C.J
-Web framework: Flask
-Cloud: Amazon EC2, Amazon RDS and Amazon S3
-Database: Postgresql
+## Tools used:
+* Programming language: Python
+* Sentiment analysis tool: [VADER: A Parsimonious Rule-based Model for Sentiment Analysis of Social Media Text](http://eegilbert.org/papers/icwsm14.vader.hutto.pdf) by Gilbert E.E. and Hutto C.J
+* Web framework: Flask
+* Cloud: Amazon EC2, Amazon RDS and Amazon S3
+* Database: Postgresql
 
 
 
